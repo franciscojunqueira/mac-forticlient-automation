@@ -104,11 +104,12 @@ echo "📏 Janela: ${WIN_WIDTH}x${WIN_HEIGHT} em ($WIN_X, $WIN_Y)"
 # ETAPA 4: CALCULAR E EXECUTAR CLIQUE
 # ============================================
 
-# Calcula posição do botão Connect usando coordenadas RELATIVAS
-# Calibrado: 62% da largura, 72% da altura (precisão de ±2 pixels)
-# Funciona em qualquer posição, qualquer monitor, coordenadas negativas
-BUTTON_X=$((WIN_X + WIN_WIDTH * 62 / 100))
-BUTTON_Y=$((WIN_Y + WIN_HEIGHT * 72 / 100))
+# Calcula posição do botão Connect usando OFFSET FIXO
+# Calibrado manualmente: 552 pixels à direita, 525 pixels abaixo
+# Mais confiável que porcentagem pois o botão não muda de posição
+# Funciona em qualquer posição de janela, qualquer monitor
+BUTTON_X=$((WIN_X + 552))
+BUTTON_Y=$((WIN_Y + 525))
 
 echo "🎯 Posição do botão: ($BUTTON_X, $BUTTON_Y)"
 echo ""

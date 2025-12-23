@@ -67,23 +67,23 @@ fi
 print_header "ETAPA 1: Parando Processos"
 
 print_info "Verificando processos ativos..."
-if pgrep -f "vpn-monitor-forticlient" > /dev/null; then
+if pgrep -f "vpn-monitor-orizon" > /dev/null; then
     print_warning "Monitor VPN está rodando. Parando..."
     
     # Tentar parar múltiplas vezes com diferentes métodos
     for attempt in 1 2 3; do
         # Método 1: pkill com padrão
-        pkill -9 -f "vpn-monitor-forticlient" 2>/dev/null || true
+        pkill -9 -f "vpn-monitor-orizon" 2>/dev/null || true
         # Método 2: killall
-        killall -9 "vpn-monitor-forticlient.sh" 2>/dev/null || true
+        killall -9 "vpn-monitor-orizon.sh" 2>/dev/null || true
         # Método 3: kill direto por PID
-        for pid in $(pgrep -f "vpn-monitor-forticlient"); do
+        for pid in $(pgrep -f "vpn-monitor-orizon"); do
             kill -9 "$pid" 2>/dev/null || true
         done
         
         sleep 1
         
-        if ! pgrep -f "vpn-monitor-forticlient" > /dev/null; then
+        if ! pgrep -f "vpn-monitor-orizon" > /dev/null; then
             print_success "Processos parados (tentativa $attempt)"
             break
         fi
@@ -91,8 +91,8 @@ if pgrep -f "vpn-monitor-forticlient" > /dev/null; then
         if [ $attempt -eq 3 ]; then
             print_error "Não foi possível parar todos os processos após 3 tentativas"
             print_info "PIDs ainda ativos:"
-            pgrep -fl "vpn-monitor-forticlient" || true
-            print_info "Tente manualmente: sudo pkill -9 -f vpn-monitor-forticlient"
+            pgrep -fl "vpn-monitor-orizon" || true
+            print_info "Tente manualmente: sudo pkill -9 -f vpn-monitor-orizon"
         fi
     done
 else
@@ -140,9 +140,9 @@ fi
 print_header "ETAPA 4: Removendo Scripts"
 
 # Script principal
-if [ -f ~/bin/vpn-monitor-forticlient.sh ]; then
+if [ -f ~/bin/vpn-monitor-orizon.sh ]; then
     print_info "Removendo script principal..."
-    rm -f ~/bin/vpn-monitor-forticlient.sh
+    rm -f ~/bin/vpn-monitor-orizon.sh
     print_success "Script principal removido"
 else
     print_info "Script principal não encontrado"
@@ -212,8 +212,8 @@ print_info "Verificando componentes restantes..."
 
 COMPONENTS_FOUND=0
 
-if [ -f ~/bin/vpn-monitor-forticlient.sh ]; then
-    print_warning "Script principal ainda existe: ~/bin/vpn-monitor-forticlient.sh"
+if [ -f ~/bin/vpn-monitor-orizon.sh ]; then
+    print_warning "Script principal ainda existe: ~/bin/vpn-monitor-orizon.sh"
     COMPONENTS_FOUND=1
 fi
 
@@ -222,7 +222,7 @@ if [ -d ~/Applications/VPNMonitor.app ]; then
     COMPONENTS_FOUND=1
 fi
 
-if pgrep -f "vpn-monitor-forticlient" > /dev/null; then
+if pgrep -f "vpn-monitor-orizon" > /dev/null; then
     print_warning "Processos ainda rodando"
     COMPONENTS_FOUND=1
 fi

@@ -1,6 +1,6 @@
-# VPN Monitor & Auto-Reconnect - FortiClient Órizon
+# VPN Monitor & Auto-Reconnect - FortiClient
 
-Sistema completo de monitoramento e reconexão automática de VPN para FortiClient Zero Trust Fabric Agent com autenticação MFA. Atinge ~95% de automação, deixando apenas a aprovação MFA manual (obrigatória por segurança).
+Complete monitoring and automatic reconnection system for FortiClient Zero Trust Fabric Agent with MFA authentication. Achieves ~95% automation, leaving only manual MFA approval (mandatory for security).
 
 ## 🎯 Funcionalidades
 
@@ -56,7 +56,7 @@ mkdir -p ~/bin ~/tmp
 
 ### Instalação Automática
 ```bash
-cd ~/GitHub/VPN-automate
+cd ~/GitHub/mac-Forticlient-automation
 ./install.sh
 ```
 
@@ -67,9 +67,9 @@ cp scripts/vpn-monitor-orizon.sh ~/bin/
 chmod +x ~/bin/vpn-monitor-orizon.sh
 
 # 2. Copiar script de clique automático
-mkdir -p ~/GitHub/VPN-automate/scripts/
-cp scripts/auto-click-connect.sh ~/GitHub/VPN-automate/scripts/
-chmod +x ~/GitHub/VPN-automate/scripts/auto-click-connect.sh
+mkdir -p ~/GitHub/mac-Forticlient-automation/scripts/
+cp scripts/auto-click-connect.sh ~/GitHub/mac-Forticlient-automation/scripts/
+chmod +x ~/GitHub/mac-Forticlient-automation/scripts/auto-click-connect.sh
 
 # 3. Iniciar monitor
 ~/bin/vpn-monitor-orizon.sh > ~/tmp/vpn-monitor.log 2>&1 &
@@ -92,7 +92,7 @@ chmod +x ~/GitHub/VPN-automate/scripts/auto-click-connect.sh
 ## 📁 Estrutura do Projeto
 
 ```
-VPN-automate/
+mac-Forticlient-automation/
 ├── README.md                           # Este arquivo
 ├── CHANGELOG.md                        # Histórico de versões
 ├── install.sh                          # Script de instalação automática
@@ -160,7 +160,7 @@ scutil --nc stop "VPN"
 ### Teste Completo com Countdown
 ```bash
 # Execute este script e MANTENHA O FOCO no terminal
-~/GitHub/VPN-automate/scripts/test-disconnect-with-countdown.sh
+~/GitHub/mac-Forticlient-automation/scripts/test-disconnect-with-countdown.sh
 
 # O script vai:
 # - Contar 5 segundos
@@ -191,7 +191,7 @@ rm -f ~/tmp/.vpn-monitor.lock
 
 ### Reiniciar o monitor (método fácil)
 ```bash
-~/GitHub/VPN-automate/scripts/restart-monitor.sh
+~/GitHub/mac-Forticlient-automation/scripts/restart-monitor.sh
 ```
 
 ### Reiniciar o monitor (método manual)
@@ -208,7 +208,7 @@ rm -f ~/tmp/.vpn-monitor.lock
 O script usa **dupla verificação** para máxima confiabilidade:
 
 1. **scutil --nc status** - API nativa do macOS para VPNs
-2. **ifconfig utun7** - Verifica se interface VPN tem IP 172.22.*
+2. **ifconfig** - Verifica se interface VPN tem IP (padrão configurável: 10.*, 172.16.*, etc)
 
 Ambos devem confirmar para considerar conectado.
 
@@ -367,7 +367,7 @@ EOF
 ### Múltiplas instâncias rodando
 ```bash
 # Usar script de restart
-~/GitHub/VPN-automate/scripts/restart-monitor.sh
+~/GitHub/mac-Forticlient-automation/scripts/restart-monitor.sh
 
 # Ou manualmente:
 pkill -9 -f vpn-monitor-orizon
@@ -382,19 +382,29 @@ rm -f ~/tmp/.vpn-monitor.lock
 - **[Calibração de Cliques](docs/CLICK-CALIBRATION.md)** - Como foram calibrados os botões
 - **[Análise Técnica](docs/vpn-monitor-analysis.md)** - Comparação de métodos de monitoramento
 
-## 📝 Configuração Específica Órizon
+## ⚙️ Configuração Personalizada
 
-Este projeto está configurado para:
-- **VPN Name:** VPN (FortiClient)
-- **Interface:** utun7
-- **IP Range:** 172.22.*
-- **Server:** vpn-a.orizon.com.br
-- **UUID:** 2617CE22-5F83-46EA-9EA3-4B9DADEC75A6
+Configure o script conforme sua VPN:
 
-Se sua configuração for diferente, ajuste:
-- `FORTICLIENT_UUID` (linha 25 do vpn-monitor-orizon.sh)
-- `VPN_INTERFACE` (linha 28)
-- Regex de IP na função `check_vpn_interface` (linha 48)
+### Descobrir UUID da sua VPN
+```bash
+scutil --nc list
+```
+
+### Editar configurações no script
+Edite `~/bin/vpn-monitor-orizon.sh`:
+
+```bash
+# Linha 13-14: UUID da sua VPN
+FORTICLIENT_UUID="YOUR-VPN-UUID-HERE"
+
+# Linha 16: Interface (geralmente utun7 para FortiClient)
+VPN_INTERFACE="utun7"
+
+# Linha 51-52: Padrão de IP da sua VPN
+# Exemplos: 10.*, 192.168.*, 172.16.*, 172.22.*
+if ifconfig "$VPN_INTERFACE" 2>/dev/null | grep -q "inet 10\.";
+```
 
 ## 🎯 Casos de Uso
 
@@ -409,11 +419,17 @@ Desenvolvedores que precisam acessar recursos internos via VPN podem continuar c
 
 ## 🤝 Contribuições
 
-Este é um projeto pessoal/interno para Órizon. Sinta-se livre para adaptar ao seu ambiente corporativo.
+Contribuições são bem-vindas! Sinta-se livre para:
+- Reportar bugs
+- Sugerir melhorias
+- Enviar pull requests
+- Adaptar para seu ambiente corporativo
 
 ## 📄 Licença
 
-Uso interno. Adapte conforme necessário respeitando políticas de segurança da sua empresa.
+MIT License - Veja LICENSE para mais detalhes.
+
+Adapte conforme necessário respeitando políticas de segurança da sua empresa.
 
 ---
 

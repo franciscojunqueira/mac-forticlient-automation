@@ -23,7 +23,7 @@ Todas as mudanças importantes neste projeto serão documentadas neste arquivo.
 - **Alertas em português brasileiro**:
   - Voz Luciana (PT-BR) para todos os alertas
   - "V P N" espaçado para pronúncia correta
-  - "Órizon" com acento para pronúncia correta
+  - Alertas genéricos configuráveis
 - **Scripts de teste**:
   - `test-disconnect-with-countdown.sh` - Teste completo com countdown
   - `force-disconnect-vpn.sh` - Desconexão forçada para testes

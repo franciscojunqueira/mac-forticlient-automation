@@ -1,4 +1,4 @@
-# Guia de Reconexão Semi-Automática da VPN Orizon
+# Guia de Reconexão Semi-Automática da VPN FortiClient
 
 ## ✅ O que foi implementado
 
@@ -9,7 +9,7 @@ O script de monitoramento agora possui **reconexão semi-automática** que funci
 ```
 1. VPN desconecta
    ↓
-2. 🔔 Alerta: "Atenção! VPN Orizon desconectada"
+2. 🔔 Alerta: "Atenção! VPN desconectada"
    ↓
 3. 🔄 Script executa: scutil --nc start (inicia processo de conexão)
    ↓

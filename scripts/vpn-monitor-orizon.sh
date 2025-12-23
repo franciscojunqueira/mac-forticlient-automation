@@ -1,16 +1,17 @@
 #!/bin/bash
 
-# VPN Monitor - Órizon
-# Monitora conexão VPN FortiClient e reconecta automaticamente
-# Com clique automático no botão Connect + restauração de contexto
-# Versão: 2.0 com 95% de automação
+# VPN Monitor for FortiClient
+# Monitors FortiClient VPN connection and reconnects automatically
+# With automatic click on Connect button + context restoration
+# Version: 2.0 with 95% automation
 
 # ============================================
 # CONFIGURAÇÕES
 # ============================================
 
 # UUID da conexão VPN (obter com: scutil --nc list)
-FORTICLIENT_UUID="2617CE22-5F83-46EA-9EA3-4B9DADEC75A6"
+# Configure com o UUID da sua VPN
+FORTICLIENT_UUID="YOUR-VPN-UUID-HERE"
 
 # Interface VPN (geralmente utun7 para FortiClient)
 VPN_INTERFACE="utun7"
@@ -47,7 +48,8 @@ check_vpn_status() {
 
 # Verificar interface de rede (backup check)
 check_vpn_interface() {
-    if ifconfig "$VPN_INTERFACE" 2>/dev/null | grep -q "inet 172\.22\."; then
+    # Ajuste o padrão de IP conforme sua VPN (ex: 10.*, 192.168.*, 172.16.*)
+    if ifconfig "$VPN_INTERFACE" 2>/dev/null | grep -q "inet 10\."
         return 0
     else
         return 1
@@ -67,14 +69,14 @@ is_vpn_connected() {
 alert_disconnection() {
     log "⚠️  VPN DESCONECTADA - Iniciando alertas..."
     
-    # Alerta de voz em português (V P N espaçado para pronunça correta)
-    say -v Luciana "Atenção! A V P N da Órizon foi desconectada. Iniciando reconexão automática." &
+    # Alerta de voz em português (V P N espaçado para pronúncia correta)
+    say -v Luciana "Atenção! A V P N foi desconectada. Iniciando reconexão automática." &
     
     # Som de alerta
     afplay /System/Library/Sounds/Glass.aiff &
     
     # Notificação do sistema
-    osascript -e 'display notification "VPN desconectada! Reconectando automaticamente..." with title "VPN Monitor Órizon" sound name "Glass"' &
+    osascript -e 'display notification "VPN desconectada! Reconectando automaticamente..." with title "VPN Monitor" sound name "Glass"' &
     
     log "📢 Alertas enviados"
 }
@@ -84,13 +86,13 @@ alert_reconnection() {
     log "✅ VPN RECONECTADA!"
     
     # Alerta de confirmação em português (V P N espaçado)
-    say -v Luciana "V P N da Órizon reconectada com sucesso" &
+    say -v Luciana "V P N reconectada com sucesso" &
     
     # Som de sucesso
     afplay /System/Library/Sounds/Hero.aiff &
     
     # Notificação
-    osascript -e 'display notification "VPN reconectada com sucesso!" with title "VPN Monitor Órizon" sound name "Hero"' &
+    osascript -e 'display notification "VPN reconectada com sucesso!" with title "VPN Monitor" sound name "Hero"' &
 }
 
 # Abrir FortiClient
@@ -132,7 +134,7 @@ EOF
             
             # Alerta para aprovar no celular  
             say -v Luciana "Aprove a conexão da V P N no seu celular" &
-            osascript -e 'display notification "Aprove a conexão VPN no seu celular" with title "VPN Monitor Órizon - MFA"' &
+            osascript -e 'display notification "Aprove a conexão VPN no seu celular" with title "VPN Monitor - MFA"' &
             
             return 0
         else
@@ -276,7 +278,7 @@ trap "rm -f '$LOCK_FILE'; log '🛑 Monitor parado'" EXIT INT TERM
 # ============================================
 
 log "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-log "🚀 VPN Monitor Órizon - Versão 2.0 (95% automação)"
+log "🚀 VPN Monitor for FortiClient - Version 2.0 (95% automation)"
 log "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 log "UUID: $FORTICLIENT_UUID"
 log "Interface: $VPN_INTERFACE"

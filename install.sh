@@ -125,7 +125,8 @@ VPN_INTERFACE=""
 for iface in $(ifconfig -l); do
     if [[ $iface == utun* ]]; then
         IP=$(ifconfig "$iface" 2>/dev/null | grep "inet " | awk '{print $2}')
-        if [[ $IP == 172.22.* ]]; then
+        # Detecta IPs privados comuns (10.*, 172.16-31.*, 192.168.*)
+        if [[ $IP == 10.* ]] || [[ $IP == 172.1[6-9].* ]] || [[ $IP == 172.2[0-9].* ]] || [[ $IP == 172.3[0-1].* ]] || [[ $IP == 192.168.* ]]; then
             VPN_INTERFACE=$iface
             print_success "Interface detectada: $VPN_INTERFACE (IP: $IP)"
             break
@@ -157,7 +158,7 @@ print_header "ETAPA 3: Instalando Scripts"
 print_info "Criando diretórios..."
 mkdir -p ~/bin
 mkdir -p ~/tmp
-mkdir -p ~/GitHub/VPN-automate/scripts
+mkdir -p ~/GitHub/mac-Forticlient-automation/scripts
 print_success "Diretórios criados"
 
 # Copiar script principal
@@ -185,11 +186,11 @@ fi
 # Copiar script de clique automático
 if [ -f "$PROJECT_DIR/scripts/auto-click-connect.sh" ]; then
     print_info "Copiando script de clique automático..."
-    if [ "$PROJECT_DIR/scripts/auto-click-connect.sh" != "$HOME/GitHub/VPN-automate/scripts/auto-click-connect.sh" ]; then
-        cp "$PROJECT_DIR/scripts/auto-click-connect.sh" ~/GitHub/VPN-automate/scripts/
+    if [ "$PROJECT_DIR/scripts/auto-click-connect.sh" != "$HOME/GitHub/mac-Forticlient-automation/scripts/auto-click-connect.sh" ]; then
+        cp "$PROJECT_DIR/scripts/auto-click-connect.sh" ~/GitHub/mac-Forticlient-automation/scripts/
     fi
-    chmod +x ~/GitHub/VPN-automate/scripts/auto-click-connect.sh
-    print_success "Script de clique: ~/GitHub/VPN-automate/scripts/auto-click-connect.sh"
+    chmod +x ~/GitHub/mac-Forticlient-automation/scripts/auto-click-connect.sh
+    print_success "Script de clique: ~/GitHub/mac-Forticlient-automation/scripts/auto-click-connect.sh"
 else
     print_warning "Script de clique não encontrado: $PROJECT_DIR/scripts/auto-click-connect.sh"
 fi
@@ -199,8 +200,8 @@ print_info "Copiando scripts auxiliares..."
 SCRIPTS_COPIED=0
 for script in restart-monitor.sh force-disconnect-vpn.sh test-disconnect-with-countdown.sh; do
     if [ -f "$PROJECT_DIR/scripts/$script" ]; then
-        cp "$PROJECT_DIR/scripts/$script" ~/GitHub/VPN-automate/scripts/
-        chmod +x ~/GitHub/VPN-automate/scripts/$script
+        cp "$PROJECT_DIR/scripts/$script" ~/GitHub/mac-Forticlient-automation/scripts/
+        chmod +x ~/GitHub/mac-Forticlient-automation/scripts/$script
         SCRIPTS_COPIED=$((SCRIPTS_COPIED + 1))
     fi
 done
@@ -316,10 +317,10 @@ else
     print_info "Consulte o README.md para mais informações\n"
 fi
 
-if [ -f ~/bin/vpn-monitor-orizon.sh ] || [ -f ~/GitHub/VPN-automate/scripts/auto-click-connect.sh ]; then
+if [ -f ~/bin/vpn-monitor-orizon.sh ] || [ -f ~/GitHub/mac-Forticlient-automation/scripts/auto-click-connect.sh ]; then
     print_info "Componentes instalados:"
     [ -f ~/bin/vpn-monitor-orizon.sh ] && echo -e "  • Script principal: ${BLUE}~/bin/vpn-monitor-orizon.sh${NC}"
-    [ -f ~/GitHub/VPN-automate/scripts/auto-click-connect.sh ] && echo -e "  • Script de clique: ${BLUE}~/GitHub/VPN-automate/scripts/auto-click-connect.sh${NC}"
+    [ -f ~/GitHub/mac-Forticlient-automation/scripts/auto-click-connect.sh ] && echo -e "  • Script de clique: ${BLUE}~/GitHub/mac-Forticlient-automation/scripts/auto-click-connect.sh${NC}"
     echo -e "  • Logs: ${BLUE}~/tmp/vpn-monitor.log${NC}"
 fi
 
@@ -334,8 +335,8 @@ echo -e "\n${BLUE}📋 Comandos úteis:${NC}"
 echo -e "  • Ver logs: ${BLUE}tail -f ~/tmp/vpn-monitor.log${NC}"
 echo -e "  • Status: ${BLUE}pgrep -lf vpn-monitor-orizon${NC}"
 echo -e "  • Parar: ${BLUE}pkill -f vpn-monitor-orizon${NC}"
-echo -e "  • Reiniciar: ${BLUE}~/GitHub/VPN-automate/scripts/restart-monitor.sh${NC}"
-echo -e "  • Testar: ${BLUE}~/GitHub/VPN-automate/scripts/test-disconnect-with-countdown.sh${NC}"
+echo -e "  • Reiniciar: ${BLUE}~/GitHub/mac-Forticlient-automation/scripts/restart-monitor.sh${NC}"
+echo -e "  • Testar: ${BLUE}~/GitHub/mac-Forticlient-automation/scripts/test-disconnect-with-countdown.sh${NC}"
 
 echo -e "\n${BLUE}🧪 Como testar:${NC}"
 echo -e "  1. Desconecte a VPN manualmente"

@@ -1,13 +1,37 @@
 #!/bin/bash
 
 # Script para clicar automaticamente no botão Connect do FortiClient
-# Versão 2.0: Com restauração completa de contexto e suporte multi-monitor
+# Versão 2.1: Com opção de privacidade (sem screenshots)
 # - Coordenadas negativas via CoreGraphics
 # - Bundle ID para restauração de foco confiável
 # - Restauração dupla de foco (imediata + após modal MFA)
+# - Opção de detecção automática (com screenshot) ou manual (sem screenshot)
+
+# ============================================
+# CARREGAR CONFIGURAÇÕES
+# ============================================
+# Tenta carregar config.sh do projeto
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+CONFIG_FILE="$PROJECT_DIR/config.sh"
+
+if [ -f "$CONFIG_FILE" ]; then
+    source "$CONFIG_FILE"
+fi
+
+# Valores padrão se não definidos no config.sh
+PRIVACY_MODE=${PRIVACY_MODE:-false}
+BUTTON_OFFSET_X=${BUTTON_OFFSET_X:-552}
+BUTTON_OFFSET_Y=${BUTTON_OFFSET_Y:-525}
 
 echo "🖱️  Clicando automaticamente no botão Connect..."
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+if [ "$PRIVACY_MODE" = true ]; then
+    echo "🔒 Modo Privacidade: ATIVADO (sem screenshots)"
+else
+    echo "🔍 Detecção Automática: ATIVADA (com screenshot)"
+fi
+echo ""
 
 # ============================================
 # ETAPA 1: SALVAR CONTEXTO DO USUÁRIO
@@ -104,27 +128,33 @@ echo "📏 Janela: ${WIN_WIDTH}x${WIN_HEIGHT} em ($WIN_X, $WIN_Y)"
 # ETAPA 4: CALCULAR E EXECUTAR CLIQUE
 # ============================================
 
-# Método 1: Tentar detecção automática via visão computacional
-DETECTOR_SCRIPT="$(dirname "$0")/find-connect-button.py"
-if [ -f "$DETECTOR_SCRIPT" ] && command -v python3 &>/dev/null; then
-    echo "🔍 Detectando posição do botão automaticamente..."
-    if $DETECTOR_SCRIPT &>/dev/null; then
-        # Lê coordenadas do JSON gerado
-        if [ -f "/tmp/forticlient-button-coords.json" ]; then
-            BUTTON_X=$(python3 -c "import json; print(json.load(open('/tmp/forticlient-button-coords.json'))['absolute_x'])")
-            BUTTON_Y=$(python3 -c "import json; print(json.load(open('/tmp/forticlient-button-coords.json'))['absolute_y'])")
-            echo "✓ Botão detectado via visão computacional"
+# Método 1: Detecção automática (se PRIVACY_MODE=false)
+if [ "$PRIVACY_MODE" = false ]; then
+    DETECTOR_SCRIPT="$(dirname "$0")/find-connect-button.py"
+    if [ -f "$DETECTOR_SCRIPT" ] && command -v python3 &>/dev/null; then
+        echo "🔍 Detectando posição do botão automaticamente..."
+        if $DETECTOR_SCRIPT &>/dev/null; then
+            # Lê coordenadas do JSON gerado
+            if [ -f "/tmp/forticlient-button-coords.json" ]; then
+                BUTTON_X=$(python3 -c "import json; print(json.load(open('/tmp/forticlient-button-coords.json'))['absolute_x'])")
+                BUTTON_Y=$(python3 -c "import json; print(json.load(open('/tmp/forticlient-button-coords.json'))['absolute_y'])")
+                echo "✓ Botão detectado via visão computacional"
+            fi
         fi
     fi
 fi
 
-# Método 2: Fallback para offset fixo calibrado
+# Método 2: Coordenadas fixas (PRIVACY_MODE=true ou fallback)
 if [ -z "$BUTTON_X" ] || [ -z "$BUTTON_Y" ]; then
-    echo "ℹ️  Usando coordenadas calibradas (fallback)..."
-    # Calcula posição do botão Connect usando OFFSET FIXO
-    # Calibrado manualmente: 552 pixels à direita, 525 pixels abaixo
-    BUTTON_X=$((WIN_X + 552))
-    BUTTON_Y=$((WIN_Y + 525))
+    if [ "$PRIVACY_MODE" = true ]; then
+        echo "🔒 Modo Privacidade: Usando coordenadas calibradas (sem screenshot)"
+    else
+        echo "ℹ️  Detecção automática falhou. Usando coordenadas calibradas (fallback)..."
+    fi
+    # Calcula posição do botão Connect usando OFFSET configurado
+    # Valores definidos em config.sh (padrão: 552, 525)
+    BUTTON_X=$((WIN_X + BUTTON_OFFSET_X))
+    BUTTON_Y=$((WIN_Y + BUTTON_OFFSET_Y))
 fi
 
 echo "🎯 Posição do botão: ($BUTTON_X, $BUTTON_Y)"

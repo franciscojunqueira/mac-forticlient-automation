@@ -49,7 +49,7 @@ check_vpn_status() {
 # Verificar interface de rede (backup check)
 check_vpn_interface() {
     # Ajuste o padrão de IP conforme sua VPN (ex: 10.*, 192.168.*, 172.16.*)
-    if ifconfig "$VPN_INTERFACE" 2>/dev/null | grep -q "inet 10\."
+    if ifconfig "$VPN_INTERFACE" 2>/dev/null | grep -q "inet 10\."; then
         return 0
     else
         return 1
@@ -108,7 +108,7 @@ auto_click_connect() {
     log "🖱️  Executando clique automático no botão Connect..."
     
     # Caminho do script de clique
-    local CLICK_SCRIPT="$HOME/GitHub/VPN-automate/scripts/auto-click-connect.sh"
+    local CLICK_SCRIPT="$HOME/GitHub/mac-Forticlient-automation/scripts/auto-click-connect.sh"
     
     if [ -f "$CLICK_SCRIPT" ]; then
         # Salva contexto antes de executar (para restauração final)

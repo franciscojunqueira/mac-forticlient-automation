@@ -104,12 +104,28 @@ echo "📏 Janela: ${WIN_WIDTH}x${WIN_HEIGHT} em ($WIN_X, $WIN_Y)"
 # ETAPA 4: CALCULAR E EXECUTAR CLIQUE
 # ============================================
 
-# Calcula posição do botão Connect usando OFFSET FIXO
-# Calibrado manualmente: 552 pixels à direita, 525 pixels abaixo
-# Mais confiável que porcentagem pois o botão não muda de posição
-# Funciona em qualquer posição de janela, qualquer monitor
-BUTTON_X=$((WIN_X + 552))
-BUTTON_Y=$((WIN_Y + 525))
+# Método 1: Tentar detecção automática via visão computacional
+DETECTOR_SCRIPT="$(dirname "$0")/find-connect-button.py"
+if [ -f "$DETECTOR_SCRIPT" ] && command -v python3 &>/dev/null; then
+    echo "🔍 Detectando posição do botão automaticamente..."
+    if $DETECTOR_SCRIPT &>/dev/null; then
+        # Lê coordenadas do JSON gerado
+        if [ -f "/tmp/forticlient-button-coords.json" ]; then
+            BUTTON_X=$(python3 -c "import json; print(json.load(open('/tmp/forticlient-button-coords.json'))['absolute_x'])")
+            BUTTON_Y=$(python3 -c "import json; print(json.load(open('/tmp/forticlient-button-coords.json'))['absolute_y'])")
+            echo "✓ Botão detectado via visão computacional"
+        fi
+    fi
+fi
+
+# Método 2: Fallback para offset fixo calibrado
+if [ -z "$BUTTON_X" ] || [ -z "$BUTTON_Y" ]; then
+    echo "ℹ️  Usando coordenadas calibradas (fallback)..."
+    # Calcula posição do botão Connect usando OFFSET FIXO
+    # Calibrado manualmente: 552 pixels à direita, 525 pixels abaixo
+    BUTTON_X=$((WIN_X + 552))
+    BUTTON_Y=$((WIN_Y + 525))
+fi
 
 echo "🎯 Posição do botão: ($BUTTON_X, $BUTTON_Y)"
 echo ""

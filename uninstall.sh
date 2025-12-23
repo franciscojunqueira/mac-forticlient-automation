@@ -52,7 +52,7 @@ print_info "Os seguintes itens NÃO serão removidos:"
 echo -e "  • Homebrew"
 echo -e "  • cliclick"
 echo -e "  • FortiClient"
-echo -e "  • Diretório do projeto (~/GitHub/VPN-automate)\n"
+echo -e "  • Diretório do projeto (~/GitHub/mac-Forticlient-automation)\n"
 
 echo -e "${YELLOW}Deseja continuar com a desinstalação? (s/N): ${NC}\c"
 read -r response
@@ -188,14 +188,14 @@ fi
 # ============================================
 print_header "ETAPA 6: Diretório do Projeto"
 
-if [ -d ~/GitHub/VPN-automate ]; then
+if [ -d ~/GitHub/mac-Forticlient-automation ]; then
     echo -e "${YELLOW}O diretório do projeto ainda existe:${NC}"
-    echo -e "${BLUE}~/GitHub/VPN-automate${NC}\n"
+    echo -e "${BLUE}~/GitHub/mac-Forticlient-automation${NC}\n"
     echo -e "Deseja removê-lo também? (s/N): \c"
     read -r response
     if [[ $response =~ ^[Ss]$ ]]; then
         print_warning "Removendo diretório do projeto..."
-        rm -rf ~/GitHub/VPN-automate
+        rm -rf ~/GitHub/mac-Forticlient-automation
         print_success "Diretório do projeto removido"
     else
         print_info "Diretório do projeto mantido"
@@ -247,11 +247,11 @@ echo -e "  • ✅ Aplicativo wrapper"
 echo -e "  • ✅ Início automático"
 echo -e "  • ✅ Processos parados"
 
-if [ -d ~/GitHub/VPN-automate ]; then
+if [ -d ~/GitHub/mac-Forticlient-automation ]; then
     echo -e "\n${BLUE}ℹ️  Diretório do projeto mantido:${NC}"
-    echo -e "  ${BLUE}~/GitHub/VPN-automate${NC}"
-    echo -e "\n  Para reinstalar: ${BLUE}cd ~/GitHub/VPN-automate && ./install.sh${NC}"
-    echo -e "  Para remover: ${BLUE}rm -rf ~/GitHub/VPN-automate${NC}"
+    echo -e "  ${BLUE}~/GitHub/mac-Forticlient-automation${NC}"
+    echo -e "\n  Para reinstalar: ${BLUE}cd ~/GitHub/mac-Forticlient-automation && ./install.sh${NC}"
+    echo -e "  Para remover: ${BLUE}rm -rf ~/GitHub/mac-Forticlient-automation${NC}"
 fi
 
 echo -e "\n${YELLOW}⚠️  Itens NÃO removidos (conforme esperado):${NC}"

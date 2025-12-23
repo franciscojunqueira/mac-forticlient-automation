@@ -214,7 +214,7 @@ Se o clique não estiver acertando o botão:
 
 ### Instalação
 ```bash
-cd ~/GitHub/VPN-automate
+cd ~/GitHub/mac-Forticlient-automation
 ./install.sh
 ```
 

@@ -260,7 +260,7 @@ if [ -f "$LOCK_FILE" ]; then
     if ps -p "$OLD_PID" > /dev/null 2>&1; then
         echo "❌ Monitor já está rodando (PID: $OLD_PID)"
         echo "   Para parar: pkill -f vpn-monitor-orizon"
-        echo "   Para reiniciar: ~/GitHub/VPN-automate/scripts/restart-monitor.sh"
+        echo "   Para reiniciar: ~/GitHub/mac-Forticlient-automation/scripts/restart-monitor.sh"
         exit 1
     else
         rm -f "$LOCK_FILE"

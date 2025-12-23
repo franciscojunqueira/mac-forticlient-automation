@@ -1,0 +1,17 @@
+# Logs
+*.log
+
+# Lock files
+*.lock
+
+# macOS
+.DS_Store
+._*
+
+# Backups
+*.bak
+*~
+
+# Temporary files
+tmp/
+temp/

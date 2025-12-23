@@ -1,0 +1,2 @@
+#!/bin/bash
+exec /Users/fjunqueira/bin/vpn-monitor-orizon.sh

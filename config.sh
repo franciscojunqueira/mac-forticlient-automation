@@ -24,7 +24,7 @@
 #   ⚠ Usa coordenadas fixas calibradas
 #   ⚠ Pode precisar recalibração se janela mudar de tamanho
 #
-export PRIVACY_MODE=false
+export PRIVACY_MODE=true
 
 # --------------------------------------------
 # COORDENADAS FIXAS (usado quando PRIVACY_MODE=true)

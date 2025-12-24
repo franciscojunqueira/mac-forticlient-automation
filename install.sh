@@ -107,10 +107,12 @@ print_header "ETAPA 2: Detectando Configuração da VPN"
 
 # Detectar UUID da VPN
 print_info "Buscando conexão VPN FortiClient..."
-VPN_UUID=$(scutil --nc list 2>/dev/null | grep -i "forticlient\|VPN" | head -1 | awk '{print $2}')
+# Pega a linha completa e extrai o UUID corretamente
+VPN_LINE=$(scutil --nc list 2>/dev/null | grep -i "forticlient\|VPN" | head -1)
+VPN_UUID=$(echo "$VPN_LINE" | grep -oE '[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}' | head -1)
 
-if [ -n "$VPN_UUID" ]; then
-    VPN_NAME=$(scutil --nc list 2>/dev/null | grep "$VPN_UUID" | sed 's/.*"\(.*\)".*/\1/')
+if [ -n "$VPN_UUID" ] && [ "$VPN_UUID" != "" ]; then
+    VPN_NAME=$(echo "$VPN_LINE" | sed 's/.*"\(.*\)".*/\1/')
     print_success "UUID detectado: $VPN_UUID"
     print_success "Nome: $VPN_NAME"
 else
@@ -195,12 +197,24 @@ else
     print_warning "Script de clique não encontrado: $PROJECT_DIR/scripts/auto-click-connect.sh"
 fi
 
+# Copiar config.sh
+if [ -f "$PROJECT_DIR/config.sh" ]; then
+    print_info "Copiando arquivo de configuração..."
+    if [ "$PROJECT_DIR/config.sh" != "$HOME/GitHub/mac-Forticlient-automation/config.sh" ]; then
+        cp "$PROJECT_DIR/config.sh" ~/GitHub/mac-Forticlient-automation/
+    fi
+    print_success "Configuração: ~/GitHub/mac-Forticlient-automation/config.sh"
+fi
+
 # Copiar scripts auxiliares
 print_info "Copiando scripts auxiliares..."
 SCRIPTS_COPIED=0
 for script in restart-monitor.sh force-disconnect-vpn.sh test-disconnect-with-countdown.sh; do
     if [ -f "$PROJECT_DIR/scripts/$script" ]; then
-        cp "$PROJECT_DIR/scripts/$script" ~/GitHub/mac-Forticlient-automation/scripts/
+        # Verifica se origem e destino são diferentes antes de copiar
+        if [ "$PROJECT_DIR/scripts/$script" != "$HOME/GitHub/mac-Forticlient-automation/scripts/$script" ]; then
+            cp "$PROJECT_DIR/scripts/$script" ~/GitHub/mac-Forticlient-automation/scripts/
+        fi
         chmod +x ~/GitHub/mac-Forticlient-automation/scripts/$script
         SCRIPTS_COPIED=$((SCRIPTS_COPIED + 1))
     fi

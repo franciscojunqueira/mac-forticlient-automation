@@ -197,12 +197,44 @@ else
     print_warning "Script de clique não encontrado: $PROJECT_DIR/scripts/auto-click-connect.sh"
 fi
 
-# Copiar config.sh
+# Copiar config.sh e configurar PRIVACY_MODE
 if [ -f "$PROJECT_DIR/config.sh" ]; then
     print_info "Copiando arquivo de configuração..."
     if [ "$PROJECT_DIR/config.sh" != "$HOME/GitHub/mac-Forticlient-automation/config.sh" ]; then
         cp "$PROJECT_DIR/config.sh" ~/GitHub/mac-Forticlient-automation/
     fi
+    
+    # Perguntar sobre modo de privacidade
+    echo -e "\n${YELLOW}Configuração do Modo de Detecção do Botão Connect:${NC}\n"
+    echo -e "1. ${GREEN}Auto-detecção${NC} (recomendado)"
+    echo -e "   ✓ Mais preciso - funciona com qualquer tamanho de janela"
+    echo -e "   ✓ Adapta-se automaticamente a mudanças na UI"
+    echo -e "   ⚠ Captura screenshot da janela FortiClient"
+    echo -e "   ⚠ Requer permissão 'Screen Recording' no macOS"
+    echo -e "   ⚠ Requer Python 3 + Pillow instalado\n"
+    
+    echo -e "2. ${BLUE}Coordenadas fixas${NC} (modo privacidade)"
+    echo -e "   ✓ SEM screenshots - SEM permissão 'Screen Recording'"
+    echo -e "   ✓ Mais privado e seguro"
+    echo -e "   ✓ Não requer Python ou bibliotecas externas"
+    echo -e "   ⚠ Usa coordenadas fixas calibradas"
+    echo -e "   ⚠ Pode precisar recalibração se janela mudar de tamanho\n"
+    
+    echo -e "Qual modo deseja usar? (1=auto-detecção, 2=coordenadas fixas) [1]: \c"
+    read -r mode_choice
+    
+    if [[ "$mode_choice" == "2" ]]; then
+        # Modo privacidade (coordenadas fixas)
+        sed -i '' 's/export PRIVACY_MODE=.*/export PRIVACY_MODE=true/' ~/GitHub/mac-Forticlient-automation/config.sh
+        print_success "Modo selecionado: Coordenadas fixas (privacidade)"
+        print_info "Permissão Screen Recording NÃO é necessária"
+    else
+        # Modo auto-detecção (padrão)
+        sed -i '' 's/export PRIVACY_MODE=.*/export PRIVACY_MODE=false/' ~/GitHub/mac-Forticlient-automation/config.sh
+        print_success "Modo selecionado: Auto-detecção (visão computacional)"
+        print_warning "Você precisará conceder permissão 'Screen Recording'"
+    fi
+    
     print_success "Configuração: ~/GitHub/mac-Forticlient-automation/config.sh"
 fi
 
@@ -230,18 +262,39 @@ fi
 # ============================================
 print_header "ETAPA 4: Verificando Permissões"
 
-print_warning "AÇÃO NECESSÁRIA:"
-echo -e "\nPara o clique automático funcionar, você precisa conceder"
-echo -e "permissões de Acessibilidade para seu terminal:\n"
-echo -e "1. Abra: ${BLUE}Configurações → Privacidade e Segurança → Acessibilidade${NC}"
-echo -e "2. Adicione seu terminal (Terminal.app ou Warp)"
-echo -e "3. Marque a caixa de seleção\n"
+print_warning "AÇÕES NECESSÁRIAS:"
+echo -e "\nPara o clique automático funcionar, você precisa conceder permissões:\n"
+echo -e "${GREEN}1. Acessibilidade${NC} (OBRIGATÓRIO)"
+echo -e "   Configurações → Privacidade e Segurança → Acessibilidade"
+echo -e "   Adicione seu terminal (Terminal.app, Warp, etc.)\n"
 
-echo -e "Deseja abrir as Configurações agora? (S/n): \c"
+# Verificar se precisa de Screen Recording
+PRIVACY_MODE=$(grep "export PRIVACY_MODE=" ~/GitHub/mac-Forticlient-automation/config.sh 2>/dev/null | cut -d'=' -f2 || echo "false")
+if [[ "$PRIVACY_MODE" == "false" ]]; then
+    echo -e "${YELLOW}2. Screen Recording${NC} (OBRIGATÓRIO para auto-detecção)"
+    echo -e "   Configurações → Privacidade e Segurança → Screen Recording"
+    echo -e "   Adicione seu terminal\n"
+else
+    echo -e "${BLUE}2. Screen Recording${NC} (NÃO necessário - modo privacidade)\n"
+fi
+
+echo -e "Deseja abrir as Configurações de Acessibilidade agora? (S/n): \c"
 read -r response
 if [[ ! $response =~ ^[Nn]$ ]]; then
     open "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
-    print_info "Aguardando configuração... (pressione ENTER quando concluir)"
+    print_info "Configure Acessibilidade..."
+    
+    if [[ "$PRIVACY_MODE" == "false" ]]; then
+        echo -e "\nDepois, deseja abrir Screen Recording? (S/n): \c"
+        read -r response2
+        if [[ ! $response2 =~ ^[Nn]$ ]]; then
+            sleep 1
+            open "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture"
+            print_info "Configure Screen Recording..."
+        fi
+    fi
+    
+    print_info "Pressione ENTER quando concluir as configurações"
     read -r
 fi
 
